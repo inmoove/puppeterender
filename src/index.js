@@ -107,25 +107,50 @@ module.exports.makeMiddleware = options => {
 		}
 
 		logger(DEBUG, `[puppeterender middleware] User Agent: ${req.headers['user-agent']}`);
-		const incomingUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-		const reload = false;
+		let incomingUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+		let reload = false;
+		if (incomingUrl.indexOf('reload=true') !== -1) {
+			reload = true;
+			incomingUrl = incomingUrl.replace('reload=true', '');
+			if (incomingUrl.charAt(incomingUrl.length-1) == '?') incomingUrl = incomingUrl.replace('?', '');
+		}
 		logger(DEBUG, `[puppeterender middleware] puppeterize url: ${incomingUrl}`);
 
 		if (useCache) {
 			cache.get(incomingUrl, (err, result) => {
 				if (!err && result) {
 					if (reload) {
-						cache.del(req.prerender.url, (err, result) => {
-							return next();
+						cache.del(incomingUrl, (err, result) => {
+							puppeterender(incomingUrl, timeout)
+								.then(content => { // eslint-disable-line promise/prefer-await-to-then
+									cache.set(incomingUrl, content);
+									logger(DEBUG, `[puppeterender middleware] Cache warmed for ${incomingUrl}.`);
+									res.set('puppeterender', 'true');
+									res.send(content);
+								})
+								.catch(err => {
+									console.error(`[puppeterender middleware] error fetching ${incomingUrl}`, err);
+									return next();
+								});
 						});
 					} else {
 						logger(DEBUG, `[puppeterender middleware] Cache hit for ${incomingUrl}.`);
 						res.set('Puppeterender', 'true');
-						res.send(cache[incomingUrl].data);
+						res.send(result);
 						return;
 					}
 				} else {
-					return next();
+					puppeterender(incomingUrl, timeout)
+						.then(content => { // eslint-disable-line promise/prefer-await-to-then
+							cache.set(incomingUrl, content);
+							logger(DEBUG, `[puppeterender middleware] Cache warmed for ${incomingUrl}.`);
+							res.set('puppeterender', 'true');
+							res.send(content);
+						})
+						.catch(err => {
+							console.error(`[puppeterender middleware] error fetching ${incomingUrl}`, err);
+							return next();
+						});
 				}
 			});
 		} else {
