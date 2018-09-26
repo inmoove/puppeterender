@@ -1,0 +1,67 @@
+{
+  "name": "pupperender",
+  "version": "1.2.0",
+  "description": "ExpressJs middleware for rendering PWA to bots using Puppeteer.",
+  "license": "MIT",
+  "repository": "Inmoove/puppeterender",
+  "bugs": {
+    "url": "https://github.com/inmoove/puppeterender/issues",
+    "email": "info@godev.space"
+  },
+  "homepage": "https://github.com/inmoove/puppeterender",
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "release": "git pull && standard-version",
+    "test": "xo && nyc ava",
+    "test:travis": "yarn test && nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "test:veyor": "ava"
+  },
+  "files": [
+    "src"
+  ],
+  "main": "src/index.js",
+  "keywords": [
+    "pupperender",
+    "renderer",
+    "pwa",
+    "spa",
+    "puppeter",
+    "rendertron",
+    "indexing",
+    "bot"
+  ],
+  "dependencies": {
+    "cache-manager": "^2.9.0",
+    "cache-manager-fs": "^1.0.6",
+    "puppeteer": "1.8.0"
+  },
+  "devDependencies": {
+    "ava": "0.25.0",
+    "codecov": "3.1.0",
+    "express": "4.16.2",
+    "nyc": "12.0.1",
+    "standard-version": "4.4.0",
+    "supertest": "3.3.0",
+    "xo": "0.22.0"
+  },
+  "xo": {
+    "rules": {
+      "max-len": [
+        "error",
+        {
+          "code": 100,
+          "ignoreUrls": true
+        }
+      ],
+      "capitalized-comments": "off"
+    }
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
+  }
+}
