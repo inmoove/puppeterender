@@ -91,7 +91,7 @@ module.exports.makeMiddleware = options => {
 	const cache = cacheManager.caching({
 		store: options.cacheStore || fsStore, //'memory'
 		options: {
-			ttl: (options.cacheTTL || (3600 * 60 * 24 * 365) * 1000 /* seconds */,
+			ttl: (options.cacheTTL || (3600 * 60 * 24 * 365)) * 1000 /* seconds */,
 			maxsize: options.cacheMaxSize || 0 /* max size in bytes on disk */,
 			path: options.cachePath || 'diskcache',
 			preventfill: Boolean(options.cachePreventFill || false)
